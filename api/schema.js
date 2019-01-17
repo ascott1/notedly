@@ -17,10 +17,10 @@ const typeDefs = gql`
   type User {
     id: ID!
     name: String
-    avatar: String
-    notes: [Note!]!
-    favorites: [Note!]!
-    following: [User!]!
+    #avatar: String
+    #notes: [Note!]!
+    #favorites: [Note!]!
+    #following: [User!]!
   }
 
   type Query {
