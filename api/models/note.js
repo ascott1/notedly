@@ -1,23 +1,29 @@
 const { ObjectId } = require('mongodb');
+const UserModel = require('./user');
 
 const NoteModel = {
-  insertNote: async (note, html, db) => {
+  insertNote: async (note, html, userId, db) => {
     let newNote = {
       content: note.content,
       htmlContent: html,
       favoriteCount: 0,
       favoritedBy: [],
       created: new Date(),
-      edited: new Date()
+      edited: new Date(),
+      authorId: userId
     };
 
     const inserted = await db.collection('notes').insertOne(newNote);
-    // get the ID of the added note and save it as a string
+    // Get the ID of the added note and save it as a string
     newNote.id = String(inserted.insertedId);
+    // Grab the author info from the database
+    newNote.author = await UserModel.getUserById(userId, db);
     return newNote;
   },
 
-  deleteNote: async (id, db) => {
+  deleteNote: async (id, userId, db) => {
+    // check that user owns the note
+
     const deleted = await db
       .collection('notes')
       .deleteOne({ _id: ObjectId(id) });
@@ -30,6 +36,8 @@ const NoteModel = {
   },
 
   updateNote: async (id, update, html, db) => {
+    // check that the user owns the note
+
     try {
       await db
         .collection('notes')
@@ -49,7 +57,6 @@ const NoteModel = {
   },
 
   readNote: async (id, db) => {
-    // TODO change to use findById?
     // TODO handle note not found
     const found = await db.collection('notes').findOne({ _id: ObjectId(id) });
     found.id = String(found._id);
@@ -64,6 +71,33 @@ const NoteModel = {
 
     // add an ID property to each returned object
     notes.map(note => (note.id = String(note._id)));
+    return notes;
+  },
+
+  myNotes: async (userId, db) => {
+    // If no user ID is passed, return null
+    if (!userId) {
+      return;
+    }
+
+    // Find all notes with the user's author ID
+    const notes = await db
+      .collection('notes')
+      .find({ authorId: userId })
+      .toArray();
+
+    // Grab the author info from the database
+    const author = await UserModel.getUserById(userId, db);
+
+    // add the ID and author values needed for our GraphQL queries
+    notes.map(note => {
+      note.id = String(note._id);
+      note.author = author;
+    });
+
+    // add an ID property to each returned object
+    notes.map(note => (note.id = String(note._id)));
+    console.log(notes);
     return notes;
   }
 };

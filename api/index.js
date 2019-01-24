@@ -1,6 +1,6 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const { MongoClient } = require('mongodb');
+const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
@@ -8,33 +8,14 @@ require('dotenv').config();
 
 const resolvers = require('./resolvers');
 const typeDefs = require('./schema');
-const auth = require('./auth');
+const authInit = require('./auth');
 const authRoutes = require('./routes/auth');
+const initializeDatabase = require('./db');
 
 const port = process.env.PORT || 4000;
-const DB_HOST = process.env.DB_HOST;
 
-async function start() {
+initializeDatabase().then(db => {
   const app = express();
-  let db;
-
-  try {
-    const client = await MongoClient.connect(
-      DB_HOST,
-      { useNewUrlParser: true }
-    );
-    db = client.db();
-  } catch (error) {
-    console.log(`
-    
-      Mongo DB Host not found!
-      please add DB_HOST environment variable to .env file
-      exiting...
-       
-    `);
-    console.error(error);
-    process.exit(1);
-  }
 
   app.use(cors());
   app.use(
@@ -49,17 +30,17 @@ async function start() {
     })
   );
 
-  app.use(auth.initialize());
+  // Authentication
+  authInit(db);
+  app.use(passport.initialize());
   app.use(authRoutes);
 
+  // Apollo Server
   const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: async ({ req }) => {
-      const user = '';
-
-      console.log(req.session);
-
+      const user = req.session.user || '';
       // add the db and the user to the context
       return { db, user };
     }
@@ -72,6 +53,4 @@ async function start() {
       `GraphQL Server running at http://localhost:4000${server.graphqlPath}`
     )
   );
-}
-
-start();
+});

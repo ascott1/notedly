@@ -7,5 +7,9 @@ module.exports = {
 
   allNotes: (parent, args, { db }) => {
     return NoteModel.allNotes(db);
+  },
+
+  myNotes: (parent, args, { db, user }) => {
+    return NoteModel.myNotes(user.id, db);
   }
 };

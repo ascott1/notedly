@@ -1,3 +1,7 @@
+/*
+ * Routes for authorization requests
+ */
+
 const express = require('express');
 const passport = require('passport');
 
@@ -12,18 +16,17 @@ router.get(
   '/auth/github/callback',
   passport.authenticate('github'),
   (req, res) => {
-    req.session.userId = req.user.id;
-    req.session.accessToken = req.user.accessToken;
-    req.session.refreshToken = req.user.refreshToken;
-    // TODO: On successful authentication
-    // Redirect to the requesting URL of the correct client
+    // add the user to the session
+    req.session.user = req.user;
+    // Send the response
+    // TODO: Redirect to the client
     res.send('Successful auth!');
   }
 );
 
 router.get('/logout', (req, res) => {
   req.session.destroy();
-  // TODO: On successful authentication
+  // TODO: On successful logout
   // Redirect to the homepage of the client
   res.send('Logged out!');
 });

@@ -7,7 +7,7 @@ const typeDefs = gql`
     id: ID!
     content: String!
     htmlContent: String!
-    # author: User!
+    author: User!
     favoriteCount: Int!
     # favoritedBy: [User!]
     created: Date!
@@ -17,7 +17,7 @@ const typeDefs = gql`
   type User {
     id: ID!
     name: String
-    #avatar: String
+    avatar: String
     #notes: [Note!]!
     #favorites: [Note!]!
     #following: [User!]!
@@ -26,6 +26,7 @@ const typeDefs = gql`
   type Query {
     singleNote(id: ID!): Note
     allNotes: [Note!]!
+    myNotes(user: ID!): [Note!]
   }
 
   type Mutation {
