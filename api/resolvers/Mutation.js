@@ -12,12 +12,12 @@ module.exports = {
     return NoteModel.insertNote(args, html, user.id, db);
   },
 
-  updateNote: (parent, args, { db }) => {
+  updateNote: (parent, args, { db, user }) => {
     let html = md(args.content);
-    return NoteModel.updateNote(args.id, args.content, html, db);
+    return NoteModel.updateNote(args.id, args.content, html, user.id, db);
   },
 
-  deleteNote: (parent, args, { db }) => {
-    return NoteModel.deleteNote(args.id, db);
+  deleteNote: (parent, args, { db, user }) => {
+    return NoteModel.deleteNote(args.id, user.id, db);
   }
 };

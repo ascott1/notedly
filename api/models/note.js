@@ -3,6 +3,11 @@ const UserModel = require('./user');
 
 const NoteModel = {
   insertNote: async (note, html, userId, db) => {
+    // If no user ID is passed, return null
+    if (!userId) {
+      return;
+    }
+
     let newNote = {
       content: note.content,
       htmlContent: html,
@@ -22,11 +27,9 @@ const NoteModel = {
   },
 
   deleteNote: async (id, userId, db) => {
-    // check that user owns the note
-
     const deleted = await db
       .collection('notes')
-      .deleteOne({ _id: ObjectId(id) });
+      .deleteOne({ _id: ObjectId(id), authorId: userId });
     // deletedCount is 1 if object is deleted from db
     if (deleted.deletedCount === 1) {
       return true;
@@ -35,32 +38,34 @@ const NoteModel = {
     }
   },
 
-  updateNote: async (id, update, html, db) => {
-    // check that the user owns the note
-
+  updateNote: async (id, update, html, userId, db) => {
+    // Try updating the note
+    // if matching ID found
+    // if current user's ID matches the author
     try {
       await db
         .collection('notes')
         .updateOne(
-          { _id: ObjectId(id) },
+          { _id: ObjectId(id), authorId: userId },
           { $set: { content: update, htmlContent: html, edited: new Date() } }
         );
     } catch (err) {
-      console.log(err);
       return new Error('Error updating note');
     }
 
-    // TODO handle note not found
-
-    // return the updated note
+    // Return the note
+    // Will be the updated note if users match, otherwise returns the original
     return NoteModel.readNote(id, db);
   },
 
   readNote: async (id, db) => {
-    // TODO handle note not found
-    const found = await db.collection('notes').findOne({ _id: ObjectId(id) });
-    found.id = String(found._id);
-    return found;
+    try {
+      const found = await db.collection('notes').findOne({ _id: ObjectId(id) });
+      found.id = String(found._id);
+      return found;
+    } catch (err) {
+      return new Error('Note not found');
+    }
   },
 
   allNotes: async db => {
@@ -97,7 +102,6 @@ const NoteModel = {
 
     // add an ID property to each returned object
     notes.map(note => (note.id = String(note._id)));
-    console.log(notes);
     return notes;
   }
 };
