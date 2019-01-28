@@ -4,9 +4,8 @@
 
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2');
-const UserModel = require('./models/user');
 
-const auth = db => {
+const auth = models => {
   passport.serializeUser((user, done) => {
     done(null, user);
   });
@@ -24,19 +23,20 @@ const auth = db => {
       },
       async (accessToken, refreshToken, profile, done) => {
         const user = {
-          githubToken: accessToken,
+          name: profile.displayName,
+          userName: profile.username,
           providerId: profile.id,
           provider: profile.provider,
-          name: profile.displayName,
           email: (profile.emails.length > 0 && profile.emails[0].value) || null,
           avatar: (profile.photos.length > 0 && profile.photos[0].value) || null
         };
 
         // Find or create user in DB and return that entry
+        // NOTE: This doesn't deal with things like user's changing their profile info
         try {
-          const dbUser = await UserModel.createOrFindUser(user, db);
-          done(null, dbUser);
-          return dbUser;
+          const dbUser = await models.User.findOrCreate(user);
+          console.log(dbUser.doc);
+          done(null, dbUser.doc);
         } catch (error) {
           done(error);
           return null;

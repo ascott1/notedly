@@ -1,38 +1,53 @@
-const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
+const findOrCreate = require('mongoose-findorcreate');
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
-const UserModel = {
-  // Find the user with the MongoDB _id
-  getUserById: async (id, db) => {
-    const found = await db.collection('users').findOne({ _id: ObjectId(id) });
-    found.id = String(found._id);
-    return found;
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true
+    },
+    provider: {
+      type: String,
+      required: true
+    },
+    providerId: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String
+    },
+    avatar: {
+      type: String
+    },
+    Notes: [
+      {
+        type: ObjectId,
+        ref: 'Note'
+      }
+    ],
+    favorites: [
+      {
+        type: ObjectId,
+        ref: 'Note'
+      }
+    ]
   },
-
-  // Find a user based on the provider's ID
-  getUserByProviderId: async (user, db) => {
-    let found = await db
-      .collection('users')
-      .findOne({ providerId: user.providerId });
-    if (found) {
-      found.id = String(found._id);
-      return found;
-    }
-    return;
-  },
-
-  // Create a new user or return an existing user
-  createOrFindUser: async (user, db) => {
-    let existingUser = await UserModel.getUserByProviderId(user, db);
-    if (existingUser) {
-      return existingUser;
-    }
-
-    const newUser = user;
-    const inserted = await db.collection('users').insertOne(newUser);
-    // get the ID of the added user and save it as a string
-    newUser.id = String(inserted.insertedId);
-    return newUser;
+  {
+    // Assigns createdAt and updatedAt fields with a Date type
+    timestamps: true
   }
-};
+);
 
-module.exports = UserModel;
+// Use the mongoose-findorcreate plugin
+// Useful for checking for an existing user before adding them to the db
+UserSchema.plugin(findOrCreate);
+
+const User = mongoose.model('User', UserSchema);
+module.exports = User;

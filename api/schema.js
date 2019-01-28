@@ -10,8 +10,8 @@ const typeDefs = gql`
     author: User!
     favoriteCount: Int!
     # favoritedBy: [User!]
-    created: Date!
-    edited: Date!
+    createdAt: Date!
+    updatedAt: Date!
   }
 
   type User {
