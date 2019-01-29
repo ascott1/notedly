@@ -9,7 +9,7 @@ const typeDefs = gql`
     htmlContent: String!
     author: User!
     favoriteCount: Int!
-    # favoritedBy: [User!]
+    favoritedBy: [User!]
     createdAt: Date!
     updatedAt: Date!
   }
@@ -18,9 +18,8 @@ const typeDefs = gql`
     id: ID!
     name: String
     avatar: String
-    #notes: [Note!]!
-    #favorites: [Note!]!
-    #following: [User!]!
+    notes: [Note!]!
+    favorites: [Note!]!
   }
 
   type Query {

@@ -3,21 +3,22 @@ const mongoose = require('mongoose');
 
 module.exports = {
   newNote: async (parent, { content }, { models, user }) => {
-    console.log(user);
     // if no user context is passed, don't create a note
     if (!user) {
       return null;
     }
 
     // Access the User model to create the Note
+    // Populate the author info
     // Return the results
     try {
-      return await models.Note.create({
+      let note = await models.Note.create({
         content,
         htmlContent: md(content),
         favoriteCount: 0,
         author: mongoose.Types.ObjectId(user._id)
       });
+      return note.populate('author').execPopulate();
     } catch (err) {
       return new Error('Error creating note');
     }
@@ -25,15 +26,15 @@ module.exports = {
 
   updateNote: async (parent, { content, id }, { models, user }) => {
     // Find the note and check if the user owns the note
-    const note = await models.Note.findById(id);
-    if (user._id !== note.author.toString()) {
+    const note = await models.Note.findById(id).populate('author');
+    if (user._id !== note.author._id.toString()) {
       return new Error('Permission denied');
     }
 
-    // If the user and owner match, update the note & return results
+    // If the user and owner match, update the note, populate author info, & return results
     // Else throw an error
     try {
-      return await models.Note.findByIdAndUpdate(
+      let note = await models.Note.findByIdAndUpdate(
         id,
         {
           $set: {
@@ -46,6 +47,7 @@ module.exports = {
           useFindAndModify: false
         }
       );
+      return note.populate('author').execPopulate();
     } catch (err) {
       return new Error('Error updating note');
     }

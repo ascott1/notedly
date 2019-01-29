@@ -1,15 +1,13 @@
-const NoteModel = require('../models/note');
-
 module.exports = {
-  singleNote: (parent, args, { db }) => {
-    return NoteModel.readNote(args.id, db);
+  singleNote: async (parent, { id }, { models }) => {
+    return await models.Note.findById(id).populate('author');
   },
 
-  allNotes: (parent, args, { db }) => {
-    return NoteModel.allNotes(db);
+  allNotes: async (parent, args, { models }) => {
+    return await models.Note.find().populate('author');
   },
 
-  myNotes: (parent, args, { db, user }) => {
-    return NoteModel.myNotes(user.id, db);
+  myNotes: async (parent, args, { models, user }) => {
+    return await models.Note.find({ author: user._id }).populate('author');
   }
 };
