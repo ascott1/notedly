@@ -6,7 +6,7 @@ const { AuthenticationError } = require('apollo-server-express');
 // Some repetition included to simplify & help understanding/teaching
 module.exports = {
   newNote: async (parent, { content }, { models, user }) => {
-    // if no user context is passed, don't create a note
+    // Ff no user context is passed, don't create a note
     if (!user) {
       throw new AuthenticationError();
     }
@@ -29,8 +29,8 @@ module.exports = {
 
   updateNote: async (parent, { content, id }, { models, user }) => {
     // Find the note and check if the user owns the note
-    const note = await models.Note.findById(id).populate('author');
-    if (!user || user._id !== note.author._id.toString()) {
+    const authorCheck = await models.Note.findById(id).populate('author');
+    if (!user || user._id !== authorCheck.author._id.toString()) {
       throw new AuthenticationError();
     }
 
@@ -77,9 +77,38 @@ module.exports = {
       throw new AuthenticationError();
     }
 
-    // TODO:
+    // TODO: Refactor to simplify and minimize queries
+
     // Check to see if the user has already favorited the note
     // If so, remove the user from the favoritedBy array and subtract 1 from the favoriteCount count
+    let noteCheck = await models.Note.findById(id);
+    const hasUser = noteCheck.favoritedBy.indexOf(user._id);
+
+    if (hasUser >= 0) {
+      try {
+        let note = await models.Note.findByIdAndUpdate(
+          id,
+          {
+            $pull: {
+              favoritedBy: mongoose.Types.ObjectId(user._id)
+            },
+            $inc: {
+              favoriteCount: -1
+            }
+          },
+          {
+            new: true,
+            useFindAndModify: false
+          }
+        );
+        return note
+          .populate('author')
+          .populate('favoritedBy')
+          .execPopulate();
+      } catch (err) {
+        return new Error('Error favoriting the note');
+      }
+    }
 
     // TODO: change to toggle favorite and remove favorite if already done
     // Add the user's ID to the favorites and increment the favorites count
