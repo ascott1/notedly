@@ -1,5 +1,6 @@
 const md = require('marked').setOptions({ headerIds: true, sanitize: true });
 const mongoose = require('mongoose');
+const { AuthenticationError } = require('apollo-server-express');
 
 // All GraphQL mutations
 // Some repetition included to simplify & help understanding/teaching
@@ -7,7 +8,7 @@ module.exports = {
   newNote: async (parent, { content }, { models, user }) => {
     // if no user context is passed, don't create a note
     if (!user) {
-      return null;
+      throw new AuthenticationError();
     }
 
     // Access the User model to create the Note
@@ -29,8 +30,8 @@ module.exports = {
   updateNote: async (parent, { content, id }, { models, user }) => {
     // Find the note and check if the user owns the note
     const note = await models.Note.findById(id).populate('author');
-    if (user._id !== note.author._id.toString()) {
-      return new Error('Permission denied');
+    if (!user || user._id !== note.author._id.toString()) {
+      throw new AuthenticationError();
     }
 
     // If the user and owner match, update the note, populate author info, & return results
@@ -58,8 +59,8 @@ module.exports = {
   deleteNote: async (parent, { id }, { models, user }) => {
     // Find the note and check if the user owns the note
     const note = await models.Note.findById(id);
-    if (user._id !== note.author.toString()) {
-      return new Error('Permission denied');
+    if (!user || user._id !== note.author.toString()) {
+      throw new AuthenticationError();
     }
 
     // If the note exists and the user has permissions, delete it & return true
@@ -73,7 +74,7 @@ module.exports = {
 
   toggleFavorite: async (parent, { id }, { models, user }) => {
     if (!user) {
-      return null;
+      throw new AuthenticationError();
     }
 
     // TODO:
