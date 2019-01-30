@@ -1,6 +1,8 @@
 const md = require('marked').setOptions({ headerIds: true, sanitize: true });
 const mongoose = require('mongoose');
 
+// All GraphQL mutations
+// Some repetition included to simplify & help understanding/teaching
 module.exports = {
   newNote: async (parent, { content }, { models, user }) => {
     // if no user context is passed, don't create a note
@@ -66,6 +68,42 @@ module.exports = {
       return true;
     } else {
       return false;
+    }
+  },
+
+  toggleFavorite: async (parent, { id }, { models, user }) => {
+    if (!user) {
+      return null;
+    }
+
+    // TODO:
+    // Check to see if the user has already favorited the note
+    // If so, remove the user from the favoritedBy array and subtract 1 from the favoriteCount count
+
+    // TODO: change to toggle favorite and remove favorite if already done
+    // Add the user's ID to the favorites and increment the favorites count
+    try {
+      let note = await models.Note.findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            favoritedBy: mongoose.Types.ObjectId(user._id)
+          },
+          $inc: {
+            favoriteCount: 1
+          }
+        },
+        {
+          new: true,
+          useFindAndModify: false
+        }
+      );
+      return note
+        .populate('author')
+        .populate('favoritedBy')
+        .execPopulate();
+    } catch (err) {
+      return new Error('Error favoriting the note');
     }
   }
 };

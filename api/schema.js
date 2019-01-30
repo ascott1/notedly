@@ -26,13 +26,16 @@ const typeDefs = gql`
     singleNote(id: ID!): Note
     allNotes: [Note!]!
     myNotes: [Note!]
+    singleUser(id: ID!): User
+    allUsers: [User!]!
+    me: User!
   }
 
   type Mutation {
     newNote(content: String!): Note
     updateNote(id: ID!, content: String!): Note!
     deleteNote(id: ID!): Boolean!
-    toggleReaction(noteID: ID!): Note
+    toggleFavorite(id: ID!): Note
   }
 `;
 

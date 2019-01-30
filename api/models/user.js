@@ -25,19 +25,7 @@ const UserSchema = new mongoose.Schema(
     },
     avatar: {
       type: String
-    },
-    Notes: [
-      {
-        type: ObjectId,
-        ref: 'Note'
-      }
-    ],
-    favorites: [
-      {
-        type: ObjectId,
-        ref: 'Note'
-      }
-    ]
+    }
   },
   {
     // Assigns createdAt and updatedAt fields with a Date type
