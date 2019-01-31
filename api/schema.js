@@ -26,6 +26,8 @@ const typeDefs = gql`
     singleNote(id: ID!): Note
     allNotes: [Note!]!
     myNotes: [Note!]
+    myFavorites: [Note!]
+    userFavorites(id: ID!): [Note!]
     singleUser(id: ID!): User
     allUsers: [User!]!
     me: User!

@@ -6,7 +6,7 @@ const { AuthenticationError } = require('apollo-server-express');
 // Some repetition included to simplify & help understanding/teaching
 module.exports = {
   newNote: async (parent, { content }, { models, user }) => {
-    // Ff no user context is passed, don't create a note
+    // If no user context is passed, don't create a note
     if (!user) {
       throw new AuthenticationError();
     }
@@ -28,17 +28,22 @@ module.exports = {
   },
 
   updateNote: async (parent, { content, id }, { models, user }) => {
-    // Find the note and check if the user owns the note
-    const authorCheck = await models.Note.findById(id).populate('author');
-    if (!user || user._id !== authorCheck.author._id.toString()) {
+    // If not a user, throw an Authentication Error
+    // We check to see if the author owns the note in the query
+    if (!user) {
       throw new AuthenticationError();
     }
 
     // If the user and owner match, update the note, populate author info, & return results
     // Else throw an error
     try {
-      let note = await models.Note.findByIdAndUpdate(
-        id,
+      let note = await models.Note.findOneAndUpdate(
+        {
+          _id: id,
+          author: {
+            _id: user._id
+          }
+        },
         {
           $set: {
             content,
@@ -57,27 +62,25 @@ module.exports = {
   },
 
   deleteNote: async (parent, { id }, { models, user }) => {
-    // Find the note and check if the user owns the note
-    const note = await models.Note.findById(id);
-    if (!user || user._id !== note.author.toString()) {
-      throw new AuthenticationError();
-    }
-
-    // If the note exists and the user has permissions, delete it & return true
-    if (note) {
+    try {
+      // Find the note and check if the user owns the note
+      const note = await models.Note.findById(id);
+      if (!user || user._id !== note.author.toString()) {
+        throw new AuthenticationError();
+      }
+      // If the user, owns the note remove it and return true
       await note.remove();
       return true;
-    } else {
-      return false;
+    } catch (err) {
+      return new Error('Error deleting the note');
     }
   },
 
   toggleFavorite: async (parent, { id }, { models, user }) => {
+    // If no user context is passed, don't create a note
     if (!user) {
       throw new AuthenticationError();
     }
-
-    // TODO: Refactor to simplify and minimize queries
 
     // Check to see if the user has already favorited the note
     // If so, remove the user from the favoritedBy array and subtract 1 from the favoriteCount count
@@ -110,7 +113,7 @@ module.exports = {
       }
     }
 
-    // TODO: change to toggle favorite and remove favorite if already done
+    // If the user hasn't favorited the note
     // Add the user's ID to the favorites and increment the favorites count
     try {
       let note = await models.Note.findByIdAndUpdate(

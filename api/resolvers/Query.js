@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 // All GraphQL queries
 // Some repetition included to simplify & help understanding/teaching
 module.exports = {
@@ -14,6 +16,20 @@ module.exports = {
   // Return all notes by the current user and populate the author info
   myNotes: async (parent, args, { models, user }) => {
     return await models.Note.find({ author: user._id }).populate('author');
+  },
+
+  // Returns all of the favorites for a given user ID
+  userFavorites: async (parent, { id }, { models }) => {
+    return await models.Note.find({
+      favoritedBy: mongoose.Types.ObjectId(id)
+    }).populate('author');
+  },
+
+  // Similar to userFavorites, returns the favorites of the current user
+  myFavorites: async (parent, args, { models, user }) => {
+    return await models.Note.find({
+      favoritedBy: mongoose.Types.ObjectId(user._id)
+    }).populate('author');
   },
 
   // Return a user with a given ID
