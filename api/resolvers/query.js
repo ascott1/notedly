@@ -9,8 +9,28 @@ module.exports = {
   },
 
   // Return all of the notes in the DB and populate the author info
-  allNotes: async (parent, args, { models }) => {
+  notes: async (parent, args, { models }) => {
     return await models.Note.find().populate('author');
+  },
+
+  // Return a paginated feed of notes
+  noteFeed: async (parent, { page }, { models }) => {
+    // Options for the paginate query
+    const options = {
+      page,
+      limit: 10,
+      sort: { createdAt: -1 },
+      populate: 'author'
+    };
+
+    // Return 10 notes, on a given page, sorted in descending order
+    const feed = await models.Note.paginate({}, options);
+    return {
+      notes: feed.docs,
+      page: feed.page,
+      pages: feed.pages,
+      total: feed.total
+    };
   },
 
   // Return all notes by the current user and populate the author info

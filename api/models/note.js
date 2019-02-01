@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const noteSchema = new mongoose.Schema(
@@ -33,5 +34,6 @@ const noteSchema = new mongoose.Schema(
   }
 );
 
+noteSchema.plugin(mongoosePaginate);
 const Note = mongoose.model('Note', noteSchema);
 module.exports = Note;

@@ -14,6 +14,13 @@ const typeDefs = gql`
     updatedAt: Date!
   }
 
+  type NoteFeed {
+    page: Int!
+    pages: Int!
+    total: Int!
+    notes: [Note!]!
+  }
+
   type User {
     id: ID!
     name: String
@@ -24,7 +31,8 @@ const typeDefs = gql`
 
   type Query {
     singleNote(id: ID!): Note
-    allNotes: [Note!]!
+    notes: [Note!]!
+    noteFeed(page: Int): NoteFeed
     myNotes: [Note!]
     myFavorites: [Note!]
     userFavorites(id: ID!): [Note!]
