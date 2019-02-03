@@ -15,20 +15,19 @@ module.exports = {
 
   // Return a paginated feed of notes
   noteFeed: async (parent, { page }, { models }) => {
-    // Options for the paginate query
-    const options = {
-      page,
-      limit: 10,
-      sort: { createdAt: -1 }
-    };
+    const total = await models.Note.estimatedDocumentCount();
+    const limit = 10;
+    const pages = Math.ceil(total / limit);
+    const skip = (page - 1) * limit;
+    const notes = await models.Note.find()
+      .sort({ createdAt: -1 })
+      .skip(skip);
 
-    // Return 10 notes, on a given page, sorted in descending order
-    const feed = await models.Note.paginate({}, options);
     return {
-      notes: feed.docs,
-      page: feed.page,
-      pages: feed.pages,
-      total: feed.total
+      notes,
+      page,
+      pages,
+      total
     };
   },
 
