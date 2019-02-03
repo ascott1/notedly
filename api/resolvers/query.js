@@ -53,23 +53,16 @@ module.exports = {
 
   // Return a user with a given ID
   singleUser: async (parent, { id }, { models }) => {
-    let requestedUser = await models.User.findById(id);
-    requestedUser.notes = await models.Note.find({ author: user._id });
-    requestedUser.favorites = await models.Note.find({ favoritedBy: user._id });
-    return requestedUser;
+    return await models.User.findById(id);
   },
 
   // Return all users.
-  // NOTE: Will not return each user's list of notes and favorites
   allUsers: async (parent, args, { models }) => {
     return await models.User.find();
   },
 
   // Return the current user's user info, a list of their notes, and a list of their favorites
   me: async (parent, args, { models, user }) => {
-    let me = await models.User.findById(user._id);
-    me.notes = await models.Note.find({ author: user._id });
-    me.favorites = await models.Note.find({ favoritedBy: user._id });
-    return me;
+    return await models.User.findById(user._id);
   }
 };
