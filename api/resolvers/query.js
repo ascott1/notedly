@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 // All GraphQL queries
 // Some repetition included to simplify & help understanding/teaching
 module.exports = {
-  // Return a note with a given ID and populate the author info
+  // Return a note with a given ID
   singleNote: async (parent, { id }, { models }) => {
-    return await models.Note.findById(id).populate('author');
+    return await models.Note.findById(id);
   },
 
-  // Return all of the notes in the DB and populate the author info
+  // Return all of the notes in the DB
   notes: async (parent, args, { models }) => {
-    return await models.Note.find().populate('author');
+    return await models.Note.find();
   },
 
   // Return a paginated feed of notes
@@ -19,8 +19,7 @@ module.exports = {
     const options = {
       page,
       limit: 10,
-      sort: { createdAt: -1 },
-      populate: 'author'
+      sort: { createdAt: -1 }
     };
 
     // Return 10 notes, on a given page, sorted in descending order
@@ -33,23 +32,23 @@ module.exports = {
     };
   },
 
-  // Return all notes by the current user and populate the author info
+  // Return all notes by the current user
   myNotes: async (parent, args, { models, user }) => {
-    return await models.Note.find({ author: user._id }).populate('author');
+    return await models.Note.find({ author: user._id });
   },
 
   // Returns all of the favorites for a given user ID
   userFavorites: async (parent, { id }, { models }) => {
     return await models.Note.find({
       favoritedBy: mongoose.Types.ObjectId(id)
-    }).populate('author');
+    });
   },
 
   // Similar to userFavorites, returns the favorites of the current user
   myFavorites: async (parent, args, { models, user }) => {
     return await models.Note.find({
       favoritedBy: mongoose.Types.ObjectId(user._id)
-    }).populate('author');
+    });
   },
 
   // Return a user with a given ID

@@ -12,16 +12,13 @@ module.exports = {
     }
 
     // Access the User model to create the Note
-    // Populate the author info
-    // Return the results
     try {
-      let note = await models.Note.create({
+      return await models.Note.create({
         content,
         htmlContent: md(content),
         favoriteCount: 0,
         author: mongoose.Types.ObjectId(user._id)
       });
-      return note.populate('author').execPopulate();
     } catch (err) {
       return new Error('Error creating note');
     }
@@ -34,10 +31,10 @@ module.exports = {
       throw new AuthenticationError();
     }
 
-    // If the user and owner match, update the note, populate author info, & return results
+    // If the user and owner match, update the note & return results
     // Else throw an error
     try {
-      let note = await models.Note.findOneAndUpdate(
+      return await models.Note.findOneAndUpdate(
         {
           _id: id,
           author: {
@@ -55,7 +52,6 @@ module.exports = {
           useFindAndModify: false
         }
       );
-      return note.populate('author').execPopulate();
     } catch (err) {
       return new Error('Error updating note');
     }
@@ -89,7 +85,7 @@ module.exports = {
 
     if (hasUser >= 0) {
       try {
-        let note = await models.Note.findByIdAndUpdate(
+        return await models.Note.findByIdAndUpdate(
           id,
           {
             $pull: {
@@ -104,10 +100,6 @@ module.exports = {
             useFindAndModify: false
           }
         );
-        return note
-          .populate('author')
-          .populate('favoritedBy')
-          .execPopulate();
       } catch (err) {
         return new Error('Error favoriting the note');
       }
@@ -116,7 +108,7 @@ module.exports = {
     // If the user hasn't favorited the note
     // Add the user's ID to the favorites and increment the favorites count
     try {
-      let note = await models.Note.findByIdAndUpdate(
+      return await models.Note.findByIdAndUpdate(
         id,
         {
           $push: {
@@ -131,10 +123,6 @@ module.exports = {
           useFindAndModify: false
         }
       );
-      return note
-        .populate('author')
-        .populate('favoritedBy')
-        .execPopulate();
     } catch (err) {
       return new Error('Error favoriting the note');
     }
