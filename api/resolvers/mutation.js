@@ -5,12 +5,11 @@ const { AuthenticationError } = require('apollo-server-express');
 // All GraphQL mutations
 // Some repetition included to simplify & help understanding/teaching
 module.exports = {
-  newNote: async (parent, args, { models, user }) => {
+  newNote: async (parent, { content }, { models, user }) => {
     // If no user context is passed, don't create a note
     if (!user) {
       throw new AuthenticationError();
     }
-
     // Access the User model to create the Note
     try {
       return await models.Note.create({
