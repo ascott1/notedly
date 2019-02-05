@@ -21,7 +21,8 @@ module.exports = {
     const skip = (page - 1) * limit;
     const notes = await models.Note.find()
       .sort({ createdAt: -1 })
-      .skip(skip);
+      .skip(skip)
+      .limit(limit);
 
     return {
       notes,
