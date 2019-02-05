@@ -2,11 +2,11 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const passport = require('passport');
 const session = require('express-session');
-const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
 require('dotenv').config();
 
+const db = require('./db');
 const resolvers = require('./resolvers');
 const typeDefs = require('./schema');
 const authInit = require('./auth');
@@ -19,13 +19,8 @@ const DB_HOST = process.env.DB_HOST;
 const app = express();
 
 // No need for async/await, Mongoose handles connection
-mongoose.set('useNewUrlParser', true);
-mongoose.connect(DB_HOST);
-mongoose.connection.on('error', err => {
-  console.error(err);
-  console.log('MongoDB connection error. Please make sure MongoDB is running.');
-  process.exit();
-});
+// Connect to our database
+db.connect(DB_HOST);
 
 app.use(cors());
 
