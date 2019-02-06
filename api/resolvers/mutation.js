@@ -19,7 +19,7 @@ module.exports = {
         author: mongoose.Types.ObjectId(user._id)
       });
     } catch (err) {
-      return new Error('Error creating note');
+      throw new Error('Error creating note');
     }
   },
 
@@ -52,7 +52,7 @@ module.exports = {
         }
       );
     } catch (err) {
-      return new Error('Error updating note');
+      throw new Error('Error updating note');
     }
   },
 
@@ -68,7 +68,7 @@ module.exports = {
       await models.Note.findOneAndRemove({ _id: id, author: user._id });
       return true;
     } catch (err) {
-      return new Error('Error deleting the note');
+      throw new Error('Error deleting the note');
     }
   },
 
@@ -101,7 +101,7 @@ module.exports = {
           }
         );
       } catch (err) {
-        return new Error('Error favoriting the note');
+        throw new Error('Error favoriting the note');
       }
     }
 
@@ -124,7 +124,7 @@ module.exports = {
         }
       );
     } catch (err) {
-      return new Error('Error favoriting the note');
+      throw new Error('Error favoriting the note');
     }
   }
 };
