@@ -4,6 +4,9 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const cors = require('cors');
+const helmet = require('helmet');
+const depthLimit = require('graphql-depth-limit');
+const { createComplexityLimitRule } = require('graphql-validation-complexity');
 require('dotenv').config();
 
 const db = require('./db');
@@ -22,6 +25,7 @@ const app = express();
 // Connect to our database
 db.connect(DB_HOST);
 
+app.use(helmet());
 app.use(cors());
 
 app.use(
@@ -46,6 +50,7 @@ app.use(authRoutes);
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  validationRules: [depthLimit(5), createComplexityLimitRule(1000)],
   context: async ({ req }) => {
     const user = req.session.user || '';
     // add the db models and the user to the context
@@ -55,8 +60,11 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app, path: '/api' });
 
-app.listen({ port }, () =>
+let expressServer = app.listen({ port }, () =>
   console.log(
     `GraphQL Server running at http://localhost:4000${server.graphqlPath}`
   )
 );
+
+// Set a timeout to prevent long running queries
+expressServer.setTimeout(5000);
