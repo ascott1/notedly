@@ -10,6 +10,9 @@
   "jest": {
     "testEnvironment": "node"
   },
+  "nodemonConfig": {
+    "ignore": ["**.test.js"]
+  },
   "keywords": [],
   "author": "Adam Scott",
   "license": "ISC",
