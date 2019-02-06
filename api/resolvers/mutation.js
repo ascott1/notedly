@@ -57,14 +57,15 @@ module.exports = {
   },
 
   deleteNote: async (parent, { id }, { models, user }) => {
+    // If not a user, throw an Authentication Error
+    // We check to see if the author owns the note in the query
+    if (!user) {
+      throw new AuthenticationError();
+    }
+
     try {
-      // Find the note and check if the user owns the note
-      const note = await models.Note.findById(id);
-      if (!user || user._id !== note.author.toString()) {
-        throw new AuthenticationError();
-      }
       // If the user, owns the note remove it and return true
-      await note.remove();
+      await models.Note.findOneAndRemove({ _id: id, author: user._id });
       return true;
     } catch (err) {
       return new Error('Error deleting the note');
