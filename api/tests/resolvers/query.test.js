@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-
 const db = require('../../db');
 const models = require('../../models');
 const resolvers = require('../../resolvers');
 const seedData = require('../../util/seed');
+
 require('dotenv').config();
 
 let data;
