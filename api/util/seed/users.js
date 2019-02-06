@@ -1,3 +1,6 @@
+/* Helper file for testing or local dev
+/* Generates 10 fake users */
+
 const faker = require('faker');
 
 const seedUsers = () => {

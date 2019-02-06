@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+/* Helper file for seeding user data during testing or local development */
 
 const models = require('../../models');
 const seedUsers = require('./users');

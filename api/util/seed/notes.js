@@ -1,3 +1,6 @@
+/* Helper file for testing or local dev
+/* Generates 25 fake notes */
+
 const faker = require('faker');
 const md = require('marked').setOptions({ headerIds: true, sanitize: true });
 const mongoose = require('mongoose');
