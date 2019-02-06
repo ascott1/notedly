@@ -11,7 +11,9 @@
     "testEnvironment": "node"
   },
   "nodemonConfig": {
-    "ignore": ["**.test.js"]
+    "ignore": [
+      "**.test.js"
+    ]
   },
   "keywords": [],
   "author": "Adam Scott",
@@ -24,6 +26,7 @@
     "express": "4.16.4",
     "express-session": "^1.15.6",
     "marked": "^0.5.2",
+    "md5": "^2.2.1",
     "mongoose": "^5.4.6",
     "mongoose-findorcreate": "^3.0.0",
     "nodemon": "^1.18.7",
