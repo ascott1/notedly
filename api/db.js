@@ -2,11 +2,13 @@ const mongoose = require('mongoose');
 
 module.exports = {
   connect: async DB_HOST => {
+    // Use the Mongo driver's updated URL string parser
     mongoose.set('useNewUrlParser', true);
-    // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
-    // by default, you need to set it to false.
+    // Use `findOneAndUpdate()` in place of findAndModify()
     mongoose.set('useFindAndModify', false);
+    // Connect to the DB
     await mongoose.connect(DB_HOST);
+    // Log an error if we fail to connect
     mongoose.connection.on('error', err => {
       console.error(err);
       console.log(
@@ -16,6 +18,7 @@ module.exports = {
     });
   },
 
+  //
   close: async () => {
     await mongoose.connection.close();
   }

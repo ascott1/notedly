@@ -96,8 +96,8 @@ module.exports = {
             }
           },
           {
-            new: true,
-            useFindAndModify: false
+            // Set new to true to return the updated doc
+            new: true
           }
         );
       } catch (err) {
