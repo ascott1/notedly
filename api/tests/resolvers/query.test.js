@@ -58,7 +58,7 @@ describe('Queries', () => {
     test('`userFavorites` should return the favorite notes of a given user', async () => {
       const user = {};
       user._id = data.notes[0].author;
-      noteId = data.notes[0]._id;
+      const noteId = data.notes[0]._id;
 
       await models.Note.findByIdAndUpdate(noteId, {
         $push: { favoritedBy: user._id }
@@ -74,7 +74,7 @@ describe('Queries', () => {
     test('`myFavorites` should return the favorite notes of the current user', async () => {
       const user = {};
       user._id = data.notes[2].author;
-      noteId = data.notes[2]._id;
+      const noteId = data.notes[2]._id;
 
       await models.Note.findByIdAndUpdate(noteId, {
         $push: { favoritedBy: user._id }
