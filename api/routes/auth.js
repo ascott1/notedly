@@ -26,8 +26,8 @@ router.get(
 
 router.get('/logout', (req, res) => {
   req.session.destroy();
-  // TODO: On successful logout
-  // Redirect to the homepage of the client
+  // TODO:
+  // On successful logout redirect to the homepage of the client
   res.send('Logged out!');
 });
 

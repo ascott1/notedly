@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const findOrCreate = require('mongoose-findorcreate');
-const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const UserSchema = new mongoose.Schema(
   {
@@ -32,10 +30,6 @@ const UserSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-
-// Use the mongoose-findorcreate plugin
-// Useful for checking for an existing user before adding them to the db
-UserSchema.plugin(findOrCreate);
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;

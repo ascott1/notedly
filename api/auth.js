@@ -34,10 +34,20 @@ const auth = models => {
         };
 
         // Find or create user in DB and return that entry
-        // NOTE: This doesn't deal with things like user's changing their profile info
         try {
-          const dbUser = await models.User.findOrCreate(user);
-          done(null, dbUser.doc);
+          const dbUser = await models.User.findOneAndUpdate(
+            {
+              providerId: user.providerId
+            },
+            {
+              $set: user
+            },
+            {
+              upsert: true,
+              new: true
+            }
+          );
+          done(null, dbUser);
         } catch (error) {
           done(error);
           return null;
