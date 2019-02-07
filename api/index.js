@@ -21,13 +21,14 @@ const DB_HOST = process.env.DB_HOST;
 
 const app = express();
 
-// No need for async/await, Mongoose handles connection
 // Connect to our database
 db.connect(DB_HOST);
 
+// Apply security and CORS middleware
 app.use(helmet());
 app.use(cors());
 
+// User Sessions
 app.use(
   session({
     resave: true,
@@ -46,7 +47,7 @@ authInit(models);
 app.use(passport.initialize());
 app.use(authRoutes);
 
-// Apollo Server
+// Apollo Server setup
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -60,11 +61,12 @@ const server = new ApolloServer({
 
 server.applyMiddleware({ app, path: '/api' });
 
-let expressServer = app.listen({ port }, () =>
+// Start Express server on port 4000 or the port specified in .env
+const expressServer = app.listen({ port }, () =>
   console.log(
     `GraphQL Server running at http://localhost:4000${server.graphqlPath}`
   )
 );
 
-// Set a timeout to prevent long running queries
+// Set a timeout as a first line of defense against malicious queries
 expressServer.setTimeout(5000);
